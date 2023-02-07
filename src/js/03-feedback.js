@@ -12,16 +12,22 @@ form.addEventListener('submit', onFormSubmit);
 
 populateForm();
 
-function onFormInput(event) {   
+function onFormInput(event) {
     formData[event.target.name] = event.target.value;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
 }
 
 function populateForm() {
     const savedMassage = localStorage.getItem(STORAGE_KEY);
-    
-    if (savedMassage) {
-        const parsedMassage = JSON.parse(savedMassage);
+
+    try {
+      const serState = localStorage.getItem(savedMassage);
+      return serState === null ? undefined : JSON.parse(serState);
+    } catch (error) {
+      console.error('Get state error: ', error.message);
+    }
+
+    if (serState) {
         email.value = parsedMassage.email;
         textarea.value = parsedMassage.message;
     }
@@ -30,7 +36,11 @@ function populateForm() {
 function onFormSubmit(event) {
     event.preventDefault();
 
+    if (event.target.email.value === "" || event.target.message.value === "") {
+      return alert("Усі поля мають бути заповнені!");
+    };
+
+    console.log(formData);
     event.target.reset();
     localStorage.removeItem(STORAGE_KEY);
-    console.log(formData)
 }
